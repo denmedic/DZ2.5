@@ -6,53 +6,51 @@ import pro.sky.java.course2.dz2_5.exeptions.EmployeeStorageIsFullException;
 import pro.sky.java.course2.dz2_5.model.Employee;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class EmployeeService {
-    private final Employee[] employees = new Employee[10];
 
-    public Employee add(String firstNameEmployee, String lastNameEmployee){
-        Employee employee = new Employee(firstNameEmployee, lastNameEmployee);
-        int index = -1;
-        for (int i = 0; i < employees.length; i++) {
-            if (Objects.equals(employees[i], employee)){
-                throw new EmployeeAlreadyAddedException();
-            }
-            if (Objects.isNull(employees[i])){
-                index = i;
-                break;
-            }
+    private static final int LIMIT = 10;
+    private final List<Employee> employees = new ArrayList<>();
+
+    public Employee add(String firstName, String lastName) {
+        Employee employee = new Employee(firstName, lastName);
+        if (employees.contains(employee)) {
+            throw new EmployeeAlreadyAddedException();
         }
-        if (index != -1){
-            employees[index] = employee;
-        } else {
-            throw new EmployeeStorageIsFullException();
+        if (employees.size() < LIMIT) {
+            employees.add(employee);
+            return employee;
         }
-        return  employee;
+        throw new EmployeeStorageIsFullException();
+    }
+
+
+    public Employee remove(String firstName, String lastName) {
+        Employee employee = new Employee(firstName, lastName);
+        if (!employees.contains(employee)) {
+            throw new EmployeeNotFoundExeption();
+        }
+        employees.remove(employee);
+        return employee;
 
     }
-    public Employee remove(String firstNameEmployee, String lastNameEmployee){
-        Employee employee = new Employee(firstNameEmployee, lastNameEmployee);
-        for (int i = 0; i < employees.length; i++) {
-            if (Objects.equals(employees[i], employee)){
-                employees[i] = null;
-                return  employee;
-            }
+
+    public Employee find(String firstName, String lastName) {
+        Employee employee = new Employee(firstName, lastName);
+        if (!employees.contains(employee)) {
+            throw new EmployeeNotFoundExeption();
         }
-        throw new EmployeeNotFoundExeption();
+        return employee;
+
 
     }
-    public Employee find(String firstNameEmployee, String lastNameEmployee){
-        Employee employee = new Employee(firstNameEmployee, lastNameEmployee);
-        for (int i = 0; i < employees.length; i++) {
-            if (Objects.equals(employees[i], employee)){
-                return employee;
-            }
-        }
-        throw new EmployeeNotFoundExeption();
 
+    public List<Employee> getAll() {
+        return new ArrayList<>(employees);
     }
+
 
 }
 
